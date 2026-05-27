@@ -1,0 +1,17 @@
+[
+  { "id": 1, "name": "Arun Kumar", "department": "IT", "salary": 45000 },
+  { "id": 2, "name": "Priya Sharma", "department": "HR", "salary": 40000 },
+  { "id": 3, "name": "Ravi Singh", "department": "Finance", "salary": 50000 },
+  { "id": 4, "name": "Meena Patel", "department": "IT", "salary": 48000 },
+  { "id": 5, "name": "Kiran Das", "department": "Marketing", "salary": 42000 },
+  { "id": 6, "name": "Suresh Reddy", "department": "Finance", "salary": 52000 },
+  { "id": 7, "name": "Anita Verma", "department": "HR", "salary": 39000 },
+  { "id": 8, "name": "Vijay Kumar", "department": "IT", "salary": 47000 },
+  { "id": 9, "name": "Neha Gupta", "department": "Marketing", "salary": 43000 },
+  { "id": 10, "name": "Rahul Jain", "department": "Finance", "salary": 51000 },
+  { "id": 11, "name": "Sneha Iyer", "department": "HR", "salary": 39500 },
+  { "id": 12, "name": "Manoj Singh", "department": "IT", "salary": 46000 },
+  { "id": 13, "name": "Divya Nair", "department": "Marketing", "salary": 44000 },
+  { "id": 14, "name": "Amit Shah", "department": "Finance", "salary": 53000 },
+  { "id": 15, "name": "Pooja Singh", "department": "HR", "salary": 40500 }
+]
