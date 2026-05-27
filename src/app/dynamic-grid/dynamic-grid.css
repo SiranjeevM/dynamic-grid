@@ -1,32 +1,37 @@
-
-table{
-    width: 60%;
-    align:centre;
-    border-collapse:collapse ;
-}
-th,td{
-    border: 1px solid #cccccc;
-    text-align: left;
-}
-th{
-    background-color: #f3f4f6;
-}
-.sorting-section{
-display: flex;
-gap: 10px;
-margin-bottom: 20px;
-}
-.sorting-section select,
-.sorting-section button{
- padding: 8px;
+.dataset-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.dataset-section{
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
 .dataset-section select,
-.dataset-section button{
-    padding: 8px;
+.dataset-section button {
+  padding: 8px;
+}
+
+.sorting-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sorting-section select,
+.sorting-section button {
+  padding: 8px;
+}
+
+table {
+  width: 60%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #cccccc;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f3f4f6;
 }

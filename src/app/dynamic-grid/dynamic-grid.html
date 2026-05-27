@@ -1,71 +1,40 @@
 <div class="dataset-section">
- 
-  <select
-    [(ngModel)]="selectedDataset"
-  >
- 
-    <option
-      *ngFor="
-        let dataset of datasetNames
-      "
-      [value]="dataset"
-    >
-      {{ dataset }}
-    </option>
- 
+  <select [(ngModel)]="selectedDataset">
+    <option *ngFor="let dataset of datasetNames"[value]="dataset">{{ dataset }}</option>
   </select>
- 
-  <button
-    (click)="loadDataset()"
-  >
-    Load Dataset
-  </button>
- 
+  <button (click)="loadDataset()">Load Dataset</button>
 </div>
- 
+
 <div class="sorting-section">
- 
+
   <select [(ngModel)]="selectedColumn">
- 
-    <option value="">
-      Select Column
-    </option>
- 
-    <option
-      *ngFor="let column of columns"
-      [value]="column"
-    >
-      {{ column }}
-    </option>
- 
+    <option value="">Select Column</option>
+    <option *ngFor="let column of columns"[value]="column">{{ column }}</option>
   </select>
- 
-  <select [(ngModel)]="selectedOrder">
- 
-    <option value="normal">
-      Normal
-    </option>
- 
-    <option value="ascending">
-      Ascending
-    </option>
- 
-    <option value="descending">
-      Descending
-    </option>
+
+  <select [(ngModel)]="selectedOrder"> 
+    <option value="normal">Normal</option>
+
+    <option value="ascending">Ascending</option>
+
+    <option value="descending">Descending</option>
+
   </select>
+
   <button (click)="sortTable()">Sort</button>
 </div>
- 
+
 <table>
-    <thead>
-        <tr>
-            <th *ngFor="let column of columns">{{column}}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let row of tableData">
-            <td *ngFor="let column of columns">{{row[column]}}</td>
-        </tr>
-    </tbody>
+  <thead>
+    <tr>
+      <th *ngFor="let column of columns">{{ column }}</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let row of tableData">
+      <td *ngFor="let column of columns">{{ row[column] }}</td>
+    </tr>
+  </tbody>
+
 </table>
