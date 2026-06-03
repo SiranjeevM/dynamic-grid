@@ -18,7 +18,7 @@ export class DynamicGrid implements OnInit {
   datasetNames = ['Employees','Airports','Students'];
   selectedDataset ='Employees';
   currentPage=1;
-  rowsPerPage=10;
+  rowsPerPage=5;
   paginatedData:Record<string,unknown>[]=[];
   sortConfigurations=[
     {
@@ -37,14 +37,17 @@ export class DynamicGrid implements OnInit {
 
   loadDataset(): void {
 
-    if (this.selectedDataset ==='Employees') {
-      this.gridService.loadEmployees().subscribe(data => {
-          this.tableData =data as Record<string,unknown>[];
+    if (this.selectedDataset === 'Employees') {
+
+      this.gridService.loadEmployeesFromApi(this.currentPage,this.rowsPerPage,this.sortConfigurations).subscribe(data => {
+          this.tableData =data as Record<string, unknown>[];
           console.log(this.tableData);
           this.columns =this.gridService.generateColumns(this.tableData);
-          this.updatePagination();
+          this.paginatedData =[...this.tableData];
+
         });
-    }
+
+}
     
     if (this.selectedDataset ==='Airports') {
       this.gridService.loadAirports().subscribe(data => {
@@ -67,8 +70,26 @@ export class DynamicGrid implements OnInit {
   }
 
   sortTable(): void {
-    this.tableData =this.gridService.sortData(this.tableData,this.sortConfigurations);
-    this.updatePagination();
+
+    if (this.selectedDataset === 'Employees') {
+
+      this.currentPage = 1;
+
+      this.loadDataset();
+
+    }
+    else {
+
+      this.tableData =
+        this.gridService.sortData(
+          this.tableData,
+          this.sortConfigurations
+        );
+
+      this.updatePagination();
+
+    }
+
   }
 
   addSortRule():void{
@@ -88,16 +109,18 @@ export class DynamicGrid implements OnInit {
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePagination();
+      this.loadDataset();
+      
     }
   }
 
   nextPage(): void {
-    const totalPages =Math.ceil(this.tableData.length /this.rowsPerPage);
-    if (this.currentPage < totalPages) {
-      this.currentPage++;
-      this.updatePagination();
+    if(this.paginatedData.length!==0){
+    this.currentPage++;
+    this.loadDataset();
     }
+
+    
   }
 
 

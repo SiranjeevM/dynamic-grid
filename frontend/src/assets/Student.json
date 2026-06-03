@@ -17,6 +17,5 @@
   { "id": 16, "name": "Swathi", "age": 18, "grade": "A" },
   { "id": 17, "name": "Ajay", "age": 19, "grade": "B" },
   { "id": 18, "name": "Keerthi", "age": 17, "grade": "A" },
-  { "id": 19, "name": "Gokul", "age": 20, "grade": "C" },
-  { "id": 20, "name": "Bhavya", "age": 18, "grade": "B" }
+  { "id": 19, "name": "Gokul", "age": 20, "grade": "C" }
 ]
