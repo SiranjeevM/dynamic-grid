@@ -16,7 +16,21 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AngularPolicy",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AngularPolicy");
 
 // Configure HTTP Pipeline
 if (app.Environment.IsDevelopment())
