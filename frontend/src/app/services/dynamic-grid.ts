@@ -7,6 +7,9 @@ import { HttpClient } from '@angular/common/http';
 
 export class DynamicGridService {
 
+
+  private apiUrl ='https://localhost:5199/api/employee';
+
   constructor(private http: HttpClient) {}
 
   loadEmployees() {
@@ -83,5 +86,19 @@ export class DynamicGridService {
     }
     return result;
   }
- 
+
+  loadEmployeesFromApi(pageNumber: number,pageSize: number,sortRules: {column: string;order: string;}[]) {
+    const apiSortRules = [];
+    for (let i = 0; i < sortRules.length; i++) {
+      if (sortRules[i].column !== '') {
+        apiSortRules.push({
+          column: sortRules[i].column,
+          order:sortRules[i].order === 'ascending'? 'ASC': 'DESC'
+        });
+      }
+    }
+
+    return this.http.post('http://localhost:5199/api/employee',{pageNumber,pageSize,sortRules: apiSortRules});
+}
+  
 }
