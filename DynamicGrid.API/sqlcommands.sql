@@ -17,3 +17,4 @@ VALUES
 ('John','IT',50000),
 ('Arun','HR',30000),
 ('David','Finance',45000);
+
