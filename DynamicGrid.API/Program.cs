@@ -1,8 +1,14 @@
+using DynamicGrid.API.Repositories.Implementations;
+using DynamicGrid.API.Repositories.Interfaces;
+using DynamicGrid.API.Services.Implementation;
+using DynamicGrid.API.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<IEmployeeRepository,EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService,EmployeeService>();
 
 var app = builder.Build();
 
