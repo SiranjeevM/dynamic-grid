@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "1Q1HF8z8g9s=",
+  "success": true,
+  "projectFilePath": "C:\\my mentor project\\dynamic-grid-sorting\\DynamicGrid.API\\DynamicGrid.API.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\HT828YZ\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.8\\microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
+    "C:\\Users\\HT828YZ\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
