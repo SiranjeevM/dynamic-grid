@@ -16,5 +16,6 @@
   { "id": 13, "name": "Divya Nair", "department": "Marketing", "salary": 44000 },
   { "id": 14, "name": "Amit Shah", "department": "Finance", "salary": 53000 },
   { "id": 15, "name": "Pooja Singh", "department": "HR", "salary": 40500 },
+   { "id": 15, "name": "Pooja Singh", "department": "HR", "salary": 40500 },
    { "id": 15, "name": "Pooja Singh", "department": "HR", "salary": 40500 }
 ]

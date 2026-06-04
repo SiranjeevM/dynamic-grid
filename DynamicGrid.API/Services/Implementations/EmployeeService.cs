@@ -25,47 +25,45 @@ public class EmployeeService : IEmployeeService
             request.PageSize = 10;
         }
 
-        Console.WriteLine($"Sort Rules Count = {request.SortRules.Count}");
+        var validColumns =await _repository.GetColumnNames(request.TableName);
 
-        var validRules =ValidateSortRules(request.SortRules);
+        var validRules =ValidateSortRules(request.SortRules,validColumns);
 
         string orderByClause =BuildOrderByClause(validRules);
 
         int offset =(request.PageNumber - 1)* request.PageSize;
 
-        Console.WriteLine($"PageNumber = {request.PageNumber}");
-
-        Console.WriteLine($"PageSize = {request.PageSize}");
-
-        Console.WriteLine($"Offset = {offset}");
-
         return await _repository.GetEmployees(offset,request.PageSize,orderByClause);
     }
 
-    private List<SortRule> ValidateSortRules(
-        List<SortRule> sortRules)
+
+    private List<SortRule> ValidateSortRules(List<SortRule> sortRules,List<string> validColumns)
     {
-        string[] validColumns =
-        {
-            "id",
-            "name",
-            "department",
-            "salary"
-        };
-        string[] uniqueColumns=[];
         List<SortRule> validRules =new List<SortRule>();
+
+        List<string> usedColumns =new List<string>();
 
         foreach (var rule in sortRules)
         {
-            if (validColumns.Contains(rule.Column))
-            {
-                validRules.Add(rule);
-            }
-        }
+            string column =rule.Column.ToLower();
 
+            if (!validColumns.Contains(column))
+            {
+                continue;
+            }
+
+            if (usedColumns.Contains(column))
+            {
+                continue;
+            }
+
+            usedColumns.Add(column);
+
+            validRules.Add(rule);
+        }
         return validRules;
     }
-
+    
     private string BuildOrderByClause(List<SortRule> sortRules)
     {
         if (sortRules.Count == 0)

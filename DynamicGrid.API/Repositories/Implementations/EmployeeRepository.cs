@@ -52,4 +52,33 @@ public class EmployeeRepository : IEmployeeRepository
 
         return employees;
     }
+
+    public async Task<List<string>> GetColumnNames(string tableName)
+    {
+        List<string> columns =new List<string>();
+        string connectionString =_configuration.GetConnectionString("DefaultConnection");
+
+        using SqlConnection connection =new SqlConnection(connectionString);
+
+        string query =
+        @"SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = @TableName";
+
+        SqlCommand command =new SqlCommand(query,connection);
+
+        command.Parameters.AddWithValue("@TableName",tableName);
+
+        await connection.OpenAsync();
+
+        SqlDataReader reader =await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            columns.Add(reader["COLUMN_NAME"].ToString().ToLower());
+        }
+
+        return columns;
+    }
+
 }

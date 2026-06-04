@@ -1,30 +1,27 @@
-<div class="dataset-section">
-  <select [(ngModel)]="selectedDataset">
-    <option *ngFor="let dataset of datasetNames"[value]="dataset">{{ dataset }}</option>
-  </select>
-  <button (click)="loadDataset()">Load Dataset</button>
-</div>
+<h2>Employee Grid</h2>
 
 <div class="sorting-section">
-  <div *ngFor=" let rule of sortConfigurations;let i = index" class="rule-row">
+
+  <div *ngFor="let rule of sortConfigurations;let i = index"class="rule-row">
+
     <select [(ngModel)]="rule.column">
       <option value="">Select Column</option>
- 
       <option *ngFor="let column of columns"[value]="column">{{ column }}</option>
     </select>
- 
     <select [(ngModel)]="rule.order">
+
       <option value="ascending">Ascending</option>
+
       <option value="descending">Descending</option>
+
     </select>
- 
+
     <button (click)="removeSortRule(i)">Remove</button>
   </div>
+
   <button (click)="addSortRule()">Add Sort Rule</button>
- 
-  <button (click)="sortTable()" class="short-btn">Sort</button>
+  <button (click)="sortTable()">Sort</button>
 </div>
- 
 
 <table>
   <thead>
@@ -38,15 +35,10 @@
       <td *ngFor="let column of columns">{{ row[column] }}</td>
     </tr>
   </tbody>
-
 </table>
 
 <div class="pagination-section">
- 
   <button (click)="previousPage()">Previous</button>
   <span>Page {{ currentPage }}</span>
- 
   <button (click)="nextPage()">Next</button>
- 
 </div>
- 
