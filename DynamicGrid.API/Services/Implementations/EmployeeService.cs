@@ -25,25 +25,16 @@ public class EmployeeService : IEmployeeService
             request.PageSize = 10;
         }
 
-        Console.WriteLine($"Sort Rules Count = {request.SortRules.Count}");
-
         var validRules =ValidateSortRules(request.SortRules);
 
         string orderByClause =BuildOrderByClause(validRules);
 
         int offset =(request.PageNumber - 1)* request.PageSize;
 
-        Console.WriteLine($"PageNumber = {request.PageNumber}");
-
-        Console.WriteLine($"PageSize = {request.PageSize}");
-
-        Console.WriteLine($"Offset = {offset}");
-
         return await _repository.GetEmployees(offset,request.PageSize,orderByClause);
     }
 
-    private List<SortRule> ValidateSortRules(
-        List<SortRule> sortRules)
+    private List<SortRule> ValidateSortRules(List<SortRule> sortRules)
     {
         string[] validColumns =
         {
@@ -52,9 +43,7 @@ public class EmployeeService : IEmployeeService
             "department",
             "salary"
         };
-        string[] uniqueColumns=[];
         List<SortRule> validRules =new List<SortRule>();
-
         foreach (var rule in sortRules)
         {
             if (validColumns.Contains(rule.Column))
@@ -62,7 +51,6 @@ public class EmployeeService : IEmployeeService
                 validRules.Add(rule);
             }
         }
-
         return validRules;
     }
 
@@ -76,9 +64,9 @@ public class EmployeeService : IEmployeeService
         string orderBy = "";
         foreach (var rule in sortRules)
         {
-            orderBy +=$"{rule.Column} {rule.Order},";
+            
+            orderBy +=$"{rule.Column} {rule.Order},"; 
         }
-
         return orderBy.TrimEnd(',');
     }
 }

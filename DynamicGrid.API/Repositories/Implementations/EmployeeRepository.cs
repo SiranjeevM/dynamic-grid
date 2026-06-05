@@ -19,21 +19,36 @@ public class EmployeeRepository : IEmployeeRepository
         List<Employee> employees =new List<Employee>();
 
         string connectionString =_configuration.GetConnectionString("DefaultConnection");
+
+        // creates a database connection
+        // ensures it is automatically closed and cleaned up
         using SqlConnection connection =new SqlConnection(connectionString);
-        string query =$@"SELECT *
+
+        // Interpolated Verbatim String
+        string query =$@"SELECT * 
            FROM Employees
            ORDER BY {orderByClause}
            OFFSET @Offset ROWS
            FETCH NEXT @PageSize ROWS ONLY";
 
+
+        // creates a command object that
+        // holds the SQL query
+        // knows which database connection to use
         SqlCommand command =new SqlCommand(query,connection);
 
         command.Parameters.AddWithValue("@Offset",offset);
 
         command.Parameters.AddWithValue("@PageSize",pageSize);
+        
 
         await connection.OpenAsync();
 
+
+        // it sends your SQL query to the database and starts reading results
+        // ExecuteReaderAsync():
+        // runs the query
+        // returns a SqlDataReader
         SqlDataReader reader =await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
