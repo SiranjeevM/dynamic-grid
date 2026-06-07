@@ -13,11 +13,15 @@ import { DynamicGridService } from '../services/dynamic-grid';
 export class DynamicGrid implements OnInit {
 
   tableData: Record<string, unknown>[] = [];
-  paginatedData: Record<string, unknown>[] = [];
   columns: string[] = [];
+  datasetNames = [
+    'Employees',
+    'Students',
+    'Airports'
+  ];
+  selectedDataset = 'Employees';
   currentPage = 1;
   rowsPerPage = 6;
-
   sortConfigurations = [
     {
       column: '',
@@ -33,14 +37,10 @@ export class DynamicGrid implements OnInit {
   }
 
   loadDataset(): void {
-
-    this.gridService.loadEmployeesFromApi(this.currentPage,this.rowsPerPage,this.sortConfigurations)
-      .subscribe(data => {
+    this.gridService.loadGridData(this.selectedDataset,this.currentPage,this.rowsPerPage,this.sortConfigurations).subscribe(data => {
         this.tableData =data as Record<string, unknown>[];
         this.columns =this.gridService.generateColumns(this.tableData);
-        this.paginatedData =[...this.tableData];
       });
-
   }
 
   sortTable(): void {
@@ -55,12 +55,10 @@ export class DynamicGrid implements OnInit {
   }
 
   removeSortRule(index: number): void {
-
     if (this.sortConfigurations.length > 1) {
       this.sortConfigurations.splice(index,1);
       this.saveState();
     }
-
   }
 
   previousPage(): void {
@@ -68,38 +66,48 @@ export class DynamicGrid implements OnInit {
       this.currentPage--;
       this.saveState();
       this.loadDataset();
-
     }
-
   }
 
   nextPage(): void {
-
-    if (this.paginatedData.length >0 ) {
+    if (this.tableData.length > 0) {
       this.currentPage++;
       this.saveState();
       this.loadDataset();
     }
+  }
 
+  onDatasetChanged(): void {
+    this.currentPage = 1;
+    this.sortConfigurations = [
+      {
+        column: '',
+        order: 'ascending'
+      }
+    ];
+    this.saveState();
+    this.loadDataset();
   }
 
   saveState(): void {
-    localStorage.setItem('employeeSortRules',JSON.stringify(this.sortConfigurations));
-    localStorage.setItem('employeeCurrentPage',this.currentPage.toString());
+    localStorage.setItem('gridSortRules',JSON.stringify(this.sortConfigurations));
+    localStorage.setItem('gridCurrentPage',this.currentPage.toString());
+    localStorage.setItem('gridSelectedDataset',this.selectedDataset);
   }
 
   loadState(): void {
-
-    const savedRules =localStorage.getItem('employeeSortRules');
+    const savedRules =localStorage.getItem('gridSortRules');
     if (savedRules) {
       this.sortConfigurations =JSON.parse(savedRules);
     }
-
-    const savedPage =localStorage.getItem('employeeCurrentPage');
+    const savedPage =localStorage.getItem('gridCurrentPage');
     if (savedPage) {
       this.currentPage =Number(savedPage);
     }
 
+    const savedDataset =localStorage.getItem('gridSelectedDataset');
+    if (savedDataset) {
+      this.selectedDataset =savedDataset;
+    }
   }
-
 }

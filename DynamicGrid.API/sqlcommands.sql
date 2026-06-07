@@ -35,3 +35,53 @@ VALUES
 
 ALTER TABLE Employees
 DROP COLUMN Email;
+
+CREATE TABLE Students
+(
+    StudentId INT PRIMARY KEY,
+    StudentName VARCHAR(100),
+    Department VARCHAR(50),
+    Mark INT
+);
+
+CREATE TABLE Airports
+(
+    AirportCode VARCHAR(10),
+    AirportName VARCHAR(100),
+    City VARCHAR(100),
+    Country VARCHAR(100)
+);
+
+INSERT INTO Students VALUES
+(1,'Arun','CSE',85),
+(2,'John','IT',90),
+(3,'David','ECE',78),
+(4,'Sarah','CSE',92),
+(5,'Michael','IT',88),
+(6,'Robert','EEE',75),
+(7,'James','ECE',81),
+(8,'Emma','CSE',95),
+(9,'Sophia','IT',89),
+(10,'Daniel','EEE',73),
+(11,'Olivia','ECE',84),
+(12,'William','CSE',87),
+(13,'Liam','IT',91),
+(14,'Noah','EEE',79),
+(15,'Ava','ECE',93);
+
+INSERT INTO Airports VALUES
+('MAA','Chennai International Airport','Chennai','India'),
+('DEL','Indira Gandhi International Airport','Delhi','India'),
+('BLR','Kempegowda International Airport','Bangalore','India'),
+('HYD','Rajiv Gandhi International Airport','Hyderabad','India'),
+('COK','Cochin International Airport','Kochi','India'),
+('BOM','Chhatrapati Shivaji Airport','Mumbai','India'),
+('CCU','Netaji Subhas Chandra Bose Airport','Kolkata','India'),
+('TRZ','Tiruchirappalli Airport','Trichy','India'),
+('IXM','Madurai Airport','Madurai','India'),
+('PNQ','Pune Airport','Pune','India'),
+('DXB','Dubai International Airport','Dubai','UAE'),
+('LHR','Heathrow Airport','London','UK'),
+('JFK','John F. Kennedy Airport','New York','USA'),
+('SIN','Changi Airport','Singapore','Singapore'),
+('SYD','Sydney Airport','Sydney','Australia');

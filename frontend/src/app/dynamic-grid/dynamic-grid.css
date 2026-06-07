@@ -55,3 +55,23 @@ th {
 .short-btn{
   margin-left: 10px;
 }
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.dataset-section {
+  margin-bottom: 20px;
+}
+
+.dataset-section select {
+  padding: 8px;
+  min-width: 180px;
+}
+
+.sorting-section {
+  margin-bottom: 20px;
+}

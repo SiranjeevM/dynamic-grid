@@ -1,6 +1,6 @@
 using DynamicGrid.API.Repositories.Implementations;
 using DynamicGrid.API.Repositories.Interfaces;
-using DynamicGrid.API.Services.Implementation;
+using DynamicGrid.API.Services.Implementations;
 using DynamicGrid.API.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Dependency Injection
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IGridRepository, GridRepository>();
+builder.Services.AddScoped<IGridService,GridService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1259,23 +1259,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\HT828YZ\\.nuget\\packages\\": {},
+    "C:\\Users\\sathi\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\my mentor project\\dynamic-grid-sorting\\DynamicGrid.API\\DynamicGrid.API.csproj",
+      "projectUniqueName": "C:\\Users\\sathi\\OneDrive\\Documents\\mentor project\\dynamic-grid\\DynamicGrid.API\\DynamicGrid.API.csproj",
       "projectName": "DynamicGrid.API",
-      "projectPath": "C:\\my mentor project\\dynamic-grid-sorting\\DynamicGrid.API\\DynamicGrid.API.csproj",
-      "packagesPath": "C:\\Users\\HT828YZ\\.nuget\\packages\\",
-      "outputPath": "C:\\my mentor project\\dynamic-grid-sorting\\DynamicGrid.API\\obj\\",
+      "projectPath": "C:\\Users\\sathi\\OneDrive\\Documents\\mentor project\\dynamic-grid\\DynamicGrid.API\\DynamicGrid.API.csproj",
+      "packagesPath": "C:\\Users\\sathi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\sathi\\OneDrive\\Documents\\mentor project\\dynamic-grid\\DynamicGrid.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\HT828YZ\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\sathi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

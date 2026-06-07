@@ -1,26 +1,28 @@
-<h2>Employee Grid</h2>
+<h2>Dynamic Grid</h2>
+<p class="section-title">Select Dataset</p>
+
+<select [(ngModel)]="selectedDataset" (change)="onDatasetChanged()">
+  <option *ngFor="let dataset of datasetNames" [value]="dataset">{{ dataset }}</option>
+</select>
 
 <div class="sorting-section">
+  <p class="section-title">Sorting Rules</p>
 
-  <div *ngFor="let rule of sortConfigurations;let i = index"class="rule-row">
-
+  <div *ngFor="let rule of sortConfigurations;let i = index" class="rule-row">
     <select [(ngModel)]="rule.column">
       <option value="">Select Column</option>
-      <option *ngFor="let column of columns"[value]="column">{{ column }}</option>
+      <option *ngFor="let column of columns" [value]="column">{{ column }}</option>
     </select>
+
     <select [(ngModel)]="rule.order">
-
       <option value="ascending">Ascending</option>
-
       <option value="descending">Descending</option>
-
     </select>
-
     <button (click)="removeSortRule(i)">Remove</button>
   </div>
 
   <button (click)="addSortRule()">Add Sort Rule</button>
-  <button (click)="sortTable()">Sort</button>
+  <button class="short-btn" (click)="sortTable()">Sort</button>
 </div>
 
 <table>
@@ -31,8 +33,9 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let row of paginatedData">
-      <td *ngFor="let column of columns">{{ row[column] }}</td>
+    <tr *ngFor="let row of tableData">
+      <td *ngFor="let column of columns">{{ row[column] }}
+      </td>
     </tr>
   </tbody>
 </table>
