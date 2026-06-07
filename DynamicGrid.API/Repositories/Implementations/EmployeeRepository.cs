@@ -7,14 +7,12 @@ namespace DynamicGrid.API.Repositories.Implementations;
 public class EmployeeRepository : IEmployeeRepository
 {
     private readonly IConfiguration _configuration;
-
-    public EmployeeRepository(
-        IConfiguration configuration)
+    public EmployeeRepository(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    public async Task<List<Employee>> GetEmployees(int offset,int pageSize,string orderByClause)
+    public List<Employee> GetEmployees(int offset,int pageSize,string orderByClause)
     {
         List<Employee> employees =new List<Employee>();
 
@@ -38,33 +36,27 @@ public class EmployeeRepository : IEmployeeRepository
         SqlCommand command =new SqlCommand(query,connection);
 
         command.Parameters.AddWithValue("@Offset",offset);
-
         command.Parameters.AddWithValue("@PageSize",pageSize);
-        
-
-        await connection.OpenAsync();
-
+        connection.Open();
 
         // it sends your SQL query to the database and starts reading results
         // ExecuteReaderAsync():
         // runs the query
         // returns a SqlDataReader
-        SqlDataReader reader =await command.ExecuteReaderAsync();
+        SqlDataReader reader =command.ExecuteReader();
 
-        while (await reader.ReadAsync())
+        while (reader.Read())
         {
             Employee employee =new Employee();
-
             employee.Id =Convert.ToInt32(reader["Id"]);
-
             employee.Name =reader["Name"].ToString();
-
             employee.Department =reader["Department"].ToString();
-
             employee.Salary =Convert.ToDecimal(reader["Salary"]);
             employees.Add(employee);
         }
-
         return employees;
     }
+
+
+
 }

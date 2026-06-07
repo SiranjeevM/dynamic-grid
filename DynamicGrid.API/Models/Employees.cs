@@ -7,4 +7,5 @@ public class Employee
 
     public decimal Salary { get; set; }
 
+
 }

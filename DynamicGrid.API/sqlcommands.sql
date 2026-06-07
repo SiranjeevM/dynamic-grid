@@ -17,9 +17,6 @@ VALUES
 ('John','IT',50000),
 ('Arun','HR',30000),
 ('David','Finance',45000);
-
-INSERT INTO Employees
-VALUES
 ('Michael', 'IT', 55000),
 ('Sarah', 'HR', 35000),
 ('Robert', 'Finance', 48000),
@@ -35,3 +32,6 @@ VALUES
 ('Suresh', 'IT', 62000),
 ('Kavya', 'Marketing', 45000),
 ('William', 'Operations', 50000);
+
+ALTER TABLE Employees
+DROP COLUMN Email;

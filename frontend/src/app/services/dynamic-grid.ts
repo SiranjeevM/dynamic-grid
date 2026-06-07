@@ -4,25 +4,27 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
-
 export class DynamicGridService {
 
-
-  private apiUrl ='https://localhost:5199/api/employee';
+  private apiUrl = 'http://localhost:5199/api/employee';
 
   constructor(private http: HttpClient) {}
 
-  loadEmployees() {
-    return this.http.get('assets/Employee.json');
-  }
+  loadEmployeesFromApi(pageNumber: number,pageSize: number,sortRules: { column: string; order: string }[]) {
 
-  loadAirports() {
-    return this.http.get('assets/Airports.json');
-  }
+    const apiSortRules = [];
 
-  loadStudents() {
-    return this.http.get('assets/Student.json');
+    for (let i = 0; i < sortRules.length; i++) {
 
+      if (sortRules[i].column !== '') {
+
+        apiSortRules.push({
+          column: sortRules[i].column,
+          order:sortRules[i].order === 'ascending'? 'ASC': 'DESC'});
+      }
+    }
+
+    return this.http.post(this.apiUrl,{pageNumber,pageSize,sortRules: apiSortRules});
   }
 
   generateColumns(data: Record<string, unknown>[]): string[] {
@@ -31,74 +33,4 @@ export class DynamicGridService {
     }
     return Object.keys(data[0]);
   }
-
-  sortData(data: Record<string, unknown>[],rules: {column: string;order: string;}[]): Record<string, unknown>[] {
-  
-    for (let i = 0;i < data.length;i++) {
-
-      for (let j = 0;j < data.length - i - 1;j++) {
-
-        let shouldSwap = false;
-
-        for (let ruleIndex = 0;ruleIndex < rules.length;ruleIndex++) {
-
-          const rule =rules[ruleIndex];
-
-          if (rule.column === '') {
-            continue;
-          }
-  
-          const first =data[j][rule.column];
-          const second =data[j + 1][rule.column];
-          if (first === second) {
-            continue;
-          }
-  
-          if (rule.order === 'ascending') {
-  
-            shouldSwap =first! > second!;
-          }
-          else {
-            shouldSwap =first! < second!;
-          }
-          break;
-        }
-  
-        if (shouldSwap) {
-  
-          const temp =data[j];
-          data[j] =data[j + 1];
-          data[j + 1] =temp;
-        }
-      }
-    }
-    return data;
-  }
- 
-
-  paginateData(data: Record<string, unknown>[],currentPage: number,rowsPerPage: number): Record<string, unknown>[] {
-    const result: Record<string, unknown>[] = [];
-    const startIndex =(currentPage - 1) * rowsPerPage;
-    const endIndex =startIndex + rowsPerPage;
-  
-    for (let i = startIndex;i < endIndex &&i < data.length;i++) {
-      result.push(data[i]);
-    }
-    return result;
-  }
-
-  loadEmployeesFromApi(pageNumber: number,pageSize: number,sortRules: {column: string;order: string;}[]) {
-    const apiSortRules = [];
-    for (let i = 0; i < sortRules.length; i++) {
-      if (sortRules[i].column !== '') {
-        apiSortRules.push({
-          column: sortRules[i].column,
-          order:sortRules[i].order === 'ascending'? 'ASC': 'DESC'
-        });
-      }
-    }
-
-    return this.http.post('http://localhost:5199/api/employee',{pageNumber,pageSize,sortRules: apiSortRules});
-}
-  
 }
