@@ -1,19 +1,4 @@
-<h2 class="title">DYNAMIC TABLE FILTER</h2>
-
-<div class="top-bar">
-
-    <!--  Dataset -->
-    <select [(ngModel)]="selectedDataset">
-        <option value="">Select Dataset</option>
-        <option value="Students">Students</option>
-    </select>
-
-    <!--  Load button -->
-    <button (click)="loadData()" [disabled]="!selectedDataset">
-        Load {{ selectedDataset }}
-    </button>
-
-</div>
+<h2 class="title">Student Academic Record</h2>
 
 <div class="filter-bar">
 
