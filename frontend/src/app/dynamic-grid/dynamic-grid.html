@@ -1,12 +1,4 @@
 <h2>Dynamic Grid</h2>
-<div class="dataset-section">
-  <p class="section-title">Select Dataset</p>
-
-  <select [(ngModel)]="selectedDataset" (change)="onDatasetChanged()">
-    <option *ngFor="let dataset of datasetNames" [value]="dataset">{{ dataset }}</option>
-  </select>
-</div>
-
 <div class="sorting-section">
   <p class="section-title">Sorting Rules</p>
 

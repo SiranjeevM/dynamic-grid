@@ -15,7 +15,7 @@ export class DynamicFilterComponent implements OnInit {
   public data: any[] = []; //  data for table
   public tableKeys: string[] = [];// keys of the data objects for dynamic table headers
 
-  public selectedDataset: string = ''; // default dataset
+  public selectedDataset: string = 'Students'; // default dataset
   public selectedColumn: string = ''; // selected column for filtering
   public selectedOperator: string = 'contains'; // selected filter operator 
 

@@ -14,12 +14,7 @@ export class DynamicGrid implements OnInit {
 
   tableData: Record<string, unknown>[] = [];
   columns: string[] = [];
-  datasetNames = [
-    'Employees',
-    'Students',
-    'Airports'
-  ];
-  selectedDataset = 'Employees';
+  selectedDataset = 'Students';
   currentPage = 1;
   rowsPerPage = 6;
   sortConfigurations = [
