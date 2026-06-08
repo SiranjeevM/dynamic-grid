@@ -17,7 +17,6 @@ namespace DynamicFilterAPI.Controllers
         private readonly List<string> allowedTables = new List<string>
         {
         "Students"
-
         };
 
         private List<Dictionary<string, object>> ExecuteQuery(string query)

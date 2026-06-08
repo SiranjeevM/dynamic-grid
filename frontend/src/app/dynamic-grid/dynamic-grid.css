@@ -4,10 +4,7 @@
   margin-bottom: 20px;
 }
 
-.dataset-section select,
-.dataset-section button {
-  padding: 8px;
-}
+
 
 .sorting-section {
   display: block;
@@ -70,6 +67,7 @@ th {
 .dataset-section select {
   padding: 8px;
   min-width: 180px;
+  font-size: 14px;
 }
 
 .sorting-section {
