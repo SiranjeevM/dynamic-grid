@@ -1,0 +1,39 @@
+<div class="app-container">
+
+  <div class="header">
+    Student Academic Management System
+  </div>
+
+  <div class="main-container">
+
+    <div class="sidebar">
+
+      <button
+        [class.active]="selectedModule === 'filter'"
+        (click)="showFilter()">
+        Filter Module
+      </button>
+
+      <button
+        [class.active]="selectedModule === 'sorting'"
+        (click)="showSorting()">
+        Sorting Module
+      </button>
+
+    </div>
+
+    <div class="content">
+
+      <app-dynamic-filter-component
+        *ngIf="selectedModule === 'filter'">
+      </app-dynamic-filter-component>
+
+      <app-dynamic-grid
+        *ngIf="selectedModule === 'sorting'">
+      </app-dynamic-grid>
+
+    </div>
+
+  </div>
+
+</div>

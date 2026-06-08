@@ -7,6 +7,7 @@ namespace DynamicGrid.API.Services.Implementations;
 public class GridService : IGridService
 {
     private readonly IGridRepository _repository;
+
     public GridService(IGridRepository repository)
     {
         _repository = repository;
@@ -18,7 +19,6 @@ public class GridService : IGridService
         {
             request.PageNumber = 1;
         }
-
         if (request.PageSize < 1)
         {
             request.PageSize = 10;
@@ -43,6 +43,10 @@ public class GridService : IGridService
                 continue;
             }
             orderBy += $"{rule.Column} {rule.Order},";
+        }
+        if (string.IsNullOrEmpty(orderBy))
+        {
+            return "1";
         }
         return orderBy.TrimEnd(',');
     }
