@@ -11,8 +11,8 @@ public class GridService : IGridService
     {
         _repository = repository;
     }
-    
-    public List<Dictionary<string, object>>GetData(GridRequest request)
+
+    public List<Dictionary<string, object>> GetData(GridRequest request)
     {
         if (request.PageNumber < 1)
         {
@@ -23,12 +23,14 @@ public class GridService : IGridService
         {
             request.PageSize = 10;
         }
-
-        int offset =(request.PageNumber - 1)* request.PageSize;
-        string orderByClause =BuildOrderByClause(request.SortRules);
-        return _repository.GetData(request.TableName,offset,request.PageSize,orderByClause);
+        // callculating the offset
+        int offset = (request.PageNumber - 1) * request.PageSize;
+        // Convert the sortRules into sql format and build sql dynamically
+        string orderByClause = BuildOrderByClause(request.SortRules);
+        return _repository.GetData(request.TableName, offset, request.PageSize, orderByClause);
     }
-    private string BuildOrderByClause(List<SortRule> sortRules){
+    private string BuildOrderByClause(List<SortRule> sortRules)
+    {
         if (sortRules.Count == 0)
         {
             return "1";
@@ -36,7 +38,11 @@ public class GridService : IGridService
         string orderBy = "";
         foreach (var rule in sortRules)
         {
-            orderBy +=$"{rule.Column} {rule.Order},";
+            if (orderBy.Contains(rule.Column + " "))
+            {
+                continue;
+            }
+            orderBy += $"{rule.Column} {rule.Order},";
         }
         return orderBy.TrimEnd(',');
     }

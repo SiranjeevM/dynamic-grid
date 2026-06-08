@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DynamicGrid.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4acc4fd4b3327a2a297f9e1bcab98c8724061aa6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79a55e1360402e603a87e3073bf73a187e591326")]
 [assembly: System.Reflection.AssemblyProductAttribute("DynamicGrid.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DynamicGrid.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

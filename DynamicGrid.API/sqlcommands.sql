@@ -85,3 +85,8 @@ INSERT INTO Airports VALUES
 ('JFK','John F. Kennedy Airport','New York','USA'),
 ('SIN','Changi Airport','Singapore','Singapore'),
 ('SYD','Sydney Airport','Sydney','Australia');
+
+
+select * from Employees;
+SELECT * FROM Students;
+SELECT * FROM Airports;
