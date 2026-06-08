@@ -1,0 +1,1136 @@
+BAckend:
+
+using Microsoft.AspNetCore.Mvc;
+using ChartApi.Repositories;
+using ChartApi.Models;
+
+
+[ApiController]
+[Route("api/[controller]")]
+public class ChartController : ControllerBase
+{
+    private readonly ChartRepository _chartRepository;
+
+    public ChartController(ChartRepository chartRepository)
+    {
+        _chartRepository = chartRepository;
+    }
+
+    [HttpGet("root")]
+    public IActionResult Root()
+    {
+        return Ok(_chartRepository.GetRootData());
+    }
+
+    [HttpGet("drilldown/{id}")]
+    public IActionResult Drilldown(int id)
+    {
+        return Ok(_chartRepository.GetChilder(id));
+    }
+}
+
+namespace ChartApi.Repositories;
+using Microsoft.Data.SqlClient;
+using ChartApi.Models;
+
+
+public class ChartRepository
+{
+private readonly IConfiguration _configuration;
+
+public ChartRepository(IConfiguration configuration)
+{
+    _configuration = configuration;
+}
+
+public List<ChartNodeDto> GetRootData()
+{
+    List<ChartNodeDto> result = new List<ChartNodeDto>();
+    string? connectionString = _configuration.GetConnectionString("DefaultConnection");
+    
+    if (string.IsNullOrEmpty(connectionString))
+        return result;
+
+    using (SqlConnection con = new SqlConnection(connectionString))
+    {
+        con.Open();
+        SqlCommand cwd = new SqlCommand(@"SELECT CategoryId, CategoryName, SalesAmount FROM Categories
+            WHERE ParentCategoryID IS NULL", con);
+
+        SqlDataReader reader = cwd.ExecuteReader();
+        while (reader.Read())
+        {
+            result.Add(new ChartNodeDto
+            {
+                Id = Convert.ToInt32(reader["CategoryId"]),
+                Label = reader["CategoryName"].ToString(),
+                Value = Convert.ToDecimal(reader["SalesAmount"]),
+            });
+        }
+    }
+    return result;
+}
+
+public List<ChartNodeDto> GetChilder(int parentId)
+{
+    List<ChartNodeDto> result = new List<ChartNodeDto>();
+    string? connectionString = _configuration.GetConnectionString("DefaultConnection");
+    
+    if (string.IsNullOrEmpty(connectionString))
+        return result;
+
+    using (SqlConnection con = new SqlConnection(connectionString))
+    {
+        con.Open();
+        SqlCommand cwd = new SqlCommand(@"SELECT CategoryId, CategoryName, SalesAmount FROM Categories
+            WHERE ParentCategoryID = @ParentId", con);
+        cwd.Parameters.AddWithValue("@ParentId", parentId);
+
+        SqlDataReader reader = cwd.ExecuteReader();
+        while (reader.Read())
+        {
+            result.Add(new ChartNodeDto
+            {
+                Id = Convert.ToInt32(reader["CategoryId"]),
+                Label = reader["CategoryName"].ToString(),
+                Value = Convert.ToDecimal(reader["SalesAmount"]),
+            });
+        }
+    }
+    return result;
+}
+}
+
+namespace ChartApi.Models;
+
+public class ChartNodeDto
+{
+    public int Id { get; set; }
+    public string? Label { get; set; }
+    public decimal Value { get; set; }
+    public bool hasChildren { get; set; }
+}
+
+using ChartApi.Models;
+
+public class ChartResponseDto
+{
+    public string? ChartType { get; set; }
+    public string? Title { get; set; }
+    public List<ChartNodeDto> Data { get; set; } = new();
+}
+
+frontend:
+services:
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { ChartNode } from '../models/chart-node.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ChartApiService {
+
+  constructor(
+    private http: HttpClient
+  ) { }
+
+  getRootChart(){
+    return this.http.get<ChartNode[]>
+    ('http://localhost:5012/api/chart/root');
+  }
+
+  getDrilldown(id: number){
+    return this.http.get<ChartNode[]>
+    (`http://localhost:5012/api/chart/drilldown/${id}`);
+  }
+}
+
+import { Injectable } from "@angular/core";
+import { PieChartData, PieSlice } from "../pie-chart/pie-chart.model";
+
+const COLORS = [
+    '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40'
+]
+
+@Injectable({providedIn: 'root'})
+export class PieChartService {
+
+    private readonly numericKeys = ['value', 'amount', 'count', 'total', 'size'];
+    private readonly labelKeys = ['label', 'name', 'code', 'category', 'title','product_name'];
+
+    getPoint(cx:number,cy:number,radius:number,angleDeg:number){
+        const rad = (angleDeg - 90) * Math.PI / 180.0;   //90 deg so that it will start from 0 degree at 12 o'clock position
+        return {
+            x: cx + radius * Math.cos(rad),
+            y: cy + radius * Math.sin(rad)
+        }
+    }
+
+    buildPath(startAngle:number,endAngle:number):string{
+        const cx = 130 , cy =130;
+        const outerR=100;
+        const sweepAngle = endAngle - startAngle;
+        if (sweepAngle >= 359.999) {
+            return [
+                `M ${cx} ${cy}`,
+                `m 0 -${outerR}`,
+                `a ${outerR} ${outerR} 0 1 1 0 ${outerR * 2}`,
+                `a ${outerR} ${outerR} 0 1 1 0 -${outerR * 2}`,
+                'Z'
+            ].join(' ');
+        }
+
+        const startOuter = this.getPoint(cx,cy,outerR,startAngle);
+        const endOuter = this.getPoint(cx,cy,outerR,endAngle);
+
+        const large = sweepAngle > 180 ? 1 : 0; //if slice>180 degree then largearcflag will be 1 otherwise 0
+
+        return[
+            `M ${cx} ${cy}`,//move to center
+            `L ${startOuter.x} ${startOuter.y}`,//line to outeredge
+            `A ${outerR} ${outerR} 0 ${large} 1 ${endOuter.x} ${endOuter.y}`,//outerarc (clockwise)
+            'Z'
+        ].join(' ');
+    }
+
+    buildSlices(data:PieChartData[]):PieSlice[]{
+        const total = data.reduce((sum, item) => sum + item.value, 0);
+        if(total === 0) return [];
+
+        let startAngle = 0;
+        return data.map((item, index) => {
+            const percentage = item.value / total;
+            const sweep = percentage * 360;
+            const endAngle = startAngle + sweep;
+
+            const slice: PieSlice = {
+                id: item.id,
+                label: item.label,
+                value: item.value,
+                percentage,
+                color: COLORS[index % COLORS.length],
+                startAngle,
+                endAngle,
+                path: this.buildPath(startAngle, endAngle)
+            };
+            startAngle = endAngle;
+            return slice;
+        });
+    }
+
+    parseJSON(text:string):PieChartData[]{
+        const raw = JSON.parse(text);
+        const arraySource = this.getArraySource(raw);
+
+        if(arraySource){
+            return this.parseArrayData(arraySource);
+        }
+
+        return Object.entries(raw as Record<string, unknown>)
+            .map(([label,value]) => ({
+                label: String(label).trim(),
+                value: parseFloat(String(value))
+            }))
+            .filter(d => d.label && Number.isFinite(d.value));
+    }
+
+    private getArraySource(raw: unknown): any[] | null {
+        if (Array.isArray(raw)) {
+            return raw;
+        }
+
+        if (!raw || typeof raw !== 'object') {
+            return null;
+        }
+
+        for (const value of Object.values(raw as Record<string, unknown>)) {
+            if (Array.isArray(value)) {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private parseArrayData(items: any[]): PieChartData[] {
+        const hasExplicitNumericValues = items.some(item => this.getNumericValue(item) !== null);
+
+        if (!hasExplicitNumericValues) {
+            const groupBy = this.getGroupingKey(items);
+            if (groupBy) {
+                return this.groupAndCount(items, groupBy);
+            }
+        }
+
+        const preferredLabelKey = this.getPreferredLabelKey(items);
+        const preferredValueKey = this.getPreferredValueKey(items);
+
+        const parsed = items
+            .map(item => {
+                const label = this.getLabel(item, preferredLabelKey);
+                const numericValue = this.getNumericValue(item, preferredValueKey);
+
+                return {
+                    label,
+                    value: numericValue ?? 1
+                };
+            })
+            .filter(d => d.label && Number.isFinite(d.value) && d.value > 0);
+
+        return this.aggregateByLabel(parsed);
+    }
+
+    private getLabel(item: any, preferredKey?: string): string {
+        if (preferredKey) {
+            const preferredValue = item?.[preferredKey];
+            if (preferredValue !== undefined && preferredValue !== null && String(preferredValue).trim()) {
+                return String(preferredValue).trim();
+            }
+        }
+
+        for (const key of this.labelKeys) {
+            const value = item?.[key];
+            if (value !== undefined && value !== null && String(value).trim()) {
+                return String(value).trim();
+            }
+        }
+
+        return '?';
+    }
+
+    private getNumericValue(item: any, preferredKey?: string): number | null {
+        if (preferredKey) {
+            const preferredValue = item?.[preferredKey];
+            const parsedPreferred = parseFloat(String(preferredValue));
+            if (Number.isFinite(parsedPreferred)) {
+                return parsedPreferred;
+            }
+        }
+
+        for (const key of this.numericKeys) {
+            const value = item?.[key];
+            const parsed = parseFloat(String(value));
+            if (Number.isFinite(parsed)) {
+                return parsed;
+            }
+        }
+
+        return null;
+    }
+
+    private getGroupingKey(items: any[]): string | null {
+        if (items.some(item => item?.country)) {
+            return 'country';
+        }
+
+        if (items.some(item => item?.city)) {
+            return 'city';
+        }
+
+        return null;
+    }
+
+    private getPreferredLabelKey(items: any[]): string | undefined {
+        const candidateKeys = ['category', 'type', 'status', 'name', 'label', 'code', 'title'];
+        for (const key of candidateKeys) {
+            const coverage = items.filter(item => item?.[key] !== undefined && item?.[key] !== null && String(item[key]).trim()).length;
+            if (coverage >= Math.ceil(items.length * 0.7)) {
+                return key;
+            }
+        }
+
+        return undefined;
+    }
+
+    private getPreferredValueKey(items: any[]): string | undefined {
+        for (const key of this.numericKeys) {
+            const coverage = items.filter(item => Number.isFinite(parseFloat(String(item?.[key])))).length;
+            if (coverage >= Math.ceil(items.length * 0.7)) {
+                return key;
+            }
+        }
+
+        return undefined;
+    }
+
+    private aggregateByLabel(rows: PieChartData[]): PieChartData[] {
+        const sums = new Map<string, number>();
+
+        for (const row of rows) {
+            sums.set(row.label, (sums.get(row.label) ?? 0) + row.value);
+        }
+
+        return Array.from(sums.entries())
+            .map(([label, value]) => ({ label, value }))
+            .sort((a, b) => b.value - a.value);
+    }
+
+    private groupAndCount(items: any[], key: string): PieChartData[] {
+        const counts = new Map<string, number>();
+
+        for (const item of items) {
+            const label = String(item?.[key] ?? '').trim();
+            if (!label) {
+                continue;
+            }
+            counts.set(label, (counts.get(label) ?? 0) + 1);
+        }
+
+        return Array.from(counts.entries())
+            .map(([label, value]) => ({ label, value }))
+            .sort((a, b) => b.value - a.value);
+    }
+}
+
+app.ts:
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { ChartApiService } from './services/chart-api.service';
+import { PieChartComponent } from './pie-chart/pie-chart.component';
+import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { ChartNode } from './models/chart-node.model';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  imports: [CommonModule, PieChartComponent, BarChartComponent]
+})
+export class AppComponent implements OnInit {
+  currentData: ChartNode[] = [];
+  breadcrumbs: string[] = [];
+  history: ChartNode[][] = [];
+  rootData: ChartNode[] = [];
+
+  currentChartType: 'pie' | 'bar' = 'pie';
+  level = 0;
+
+  constructor(private chartApi: ChartApiService) {}
+
+  ngOnInit(): void {
+    this.chartApi.getRootChart().subscribe(result => {
+      this.currentData = result;
+      this.rootData = result;
+      this.level = 0;
+      this.currentChartType = 'pie';
+    });
+  }
+
+  onNodeSelected(node: ChartNode): void {
+    if (!node.id) {
+      return;
+    }
+
+    this.chartApi.getDrilldown(node.id).subscribe(result => {
+      if (!result.length) {
+        return;
+      }
+
+      this.history.push(this.currentData);
+      this.breadcrumbs.push(node.label);
+      this.currentData = result;
+      this.level++;
+      this.currentChartType = this.level % 2 === 0 ? 'pie' : 'bar';
+    });
+  }
+
+  goBack(): void {
+    if (this.history.length === 0) {
+      return;
+    }
+    this.currentData = this.history.pop()!;
+    this.breadcrumbs.pop();
+    this.level--;
+    this.currentChartType = this.level % 2 === 0 ? 'pie' : 'bar';
+  }
+
+  goHome(): void {
+    this.currentData = this.rootData;
+    this.history = [];
+    this.breadcrumbs = [];
+    this.level = 0;
+    this.currentChartType = 'pie';
+  }
+
+  navigateUp(): void {
+    if (this.history.length > 1) {
+      this.goBack();
+      return;
+    }
+    this.goHome();
+  }
+}
+
+<div class="breadcrumb">
+  <button type="button" *ngIf="history.length" (click)="navigateUp()">
+    {{ history.length > 1 ? 'Back' : 'Home' }}
+  </button>
+  <span>Home</span>
+  <span *ngFor="let item of breadcrumbs"> &gt; {{ item }} </span>
+</div>
+
+<app-pie-chart
+  *ngIf="currentChartType === 'pie'"
+  [data]="currentData"
+  title="Pie Chart"
+  (sliceClick)="onNodeSelected($event)">
+</app-pie-chart>
+
+<app-bar-chart
+  *ngIf="currentChartType === 'bar'"
+  [data]="currentData"
+  (barClicked)="onNodeSelected($event)">
+</app-bar-chart>
+
+APP.css
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background: #f5f7fa;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+app-root {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+}
+
+h1 {
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.chart-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0;
+}
+
+button {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  margin: 10px;
+
+  &:hover {
+    background-color: #0052a3;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+  }
+
+  &:active {
+    background-color: #003d7a;
+  }
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 20px;
+  margin: 16px auto;
+  max-width: 900px;
+//   background: #ffffff;
+//   border: 1px solid #e6eaf0;
+//   border-radius: 8px;
+//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-size: 20px;
+  color: #555;
+
+  button {
+    background: #f0f4ff;
+    color: #0052a3;
+    padding: 6px 14px;
+    margin: 0 8px 0 0;
+    font-size: 13px;
+    border-radius: 6px;
+    box-shadow: none;
+
+    &:hover {
+      background: #dbe6ff;
+      box-shadow: none;
+    }
+  }
+
+  span {
+    color: #555;
+
+    &:first-of-type {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+  }
+}
+
+pie-chart 
+
+ts
+
+import { CommonModule } from "@angular/common";
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild } from "@angular/core";
+import { PieChartData, PieSlice } from "./pie-chart.model";
+import { PieChartService } from "../services/pie-chart.service";
+import { ChartNode } from "../models/chart-node.model";
+
+@Component({
+    selector: 'app-pie-chart',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './pie-chart.component.html',
+    styleUrls: ['./pie-chart.component.scss'],
+    changeDetection:ChangeDetectionStrategy.OnPush
+})
+
+export class PieChartComponent implements OnChanges{
+
+    @Input() data: PieChartData[] = [];
+    @Input() title: string = 'Chart';
+    @Output() sliceClick = new EventEmitter<PieSlice>();
+    @Output() sliceSelected = new EventEmitter<ChartNode>();
+
+    @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+    slices: PieSlice[] = [];
+    hoveredIndex = -1;
+    errorMessage = '';
+
+    constructor(
+        private pieChartService: PieChartService
+    ){}
+
+    ngOnChanges(): void {
+        this.hoveredIndex = -1;
+        this.slices = this.data.length ? this.pieChartService.buildSlices(this.data) : [];
+    }
+
+    get hoveredSlice(): PieSlice | null {
+        if (this.hoveredIndex < 0 || this.hoveredIndex >= this.slices.length) {
+            return null;
+        }
+
+        return this.slices[this.hoveredIndex];
+    }
+
+    onSliceClick(slice:PieSlice){
+        this.sliceClick.emit(slice);
+    }
+
+    onSliceSelected(slice:ChartNode){
+        this.sliceSelected.emit(slice);
+    }
+
+    // openFilePicker(){
+    //     this.fileInput.nativeElement.click();
+    // }
+
+    // onFileSelected(event:Event):void{
+    //     const input = event.target as HTMLInputElement;
+    //     const file = input.files?.[0];
+    //     if(!file) return;
+
+    //     const reader = new FileReader();
+    //     reader.onload = (e) => {
+    //         try{
+    //             const text = e.target?.result as string;
+    //             const parsed = this.pieChartService.parseJSON(text);
+
+    //             if (!parsed.length) {
+    //                 throw new Error('No valid rows found');
+    //             }
+                
+    //             this.slices = this.pieChartService.buildSlices(parsed);
+    //             this.errorMessage = '';
+    //         }catch{
+    //             this.errorMessage = 'Could not read file. Check format and try again.';
+    //             this.slices = [];
+    //         }
+
+    //         input.value = '';
+    //         this.cdr.markForCheck();
+    //     };
+    //     reader.readAsText(file);
+    // }
+
+    onHover(index:number):void{
+        this.hoveredIndex = index;
+    }
+    onLeave():void{
+        this.hoveredIndex = -1;
+    }   
+
+    getOpacity(index:number):number{
+        if(this.hoveredIndex === -1 || this.hoveredIndex >= this.slices.length) return 1;
+        return this.hoveredIndex === index ? 1 : 0.3;
+    }
+
+    getTotal():number{
+        return this.slices.reduce((sum, slice) => sum + slice.value, 0);
+    }
+
+    toPct(value:number):string{
+        return (value * 100).toFixed(1) + '%';
+    }
+    
+}
+
+export interface PieChartData {
+    id?: number;
+    label: string;
+    value: number;
+}
+
+export interface PieSlice{
+    id?: number;
+    label: string;
+    value: number;
+    percentage: number;
+    color: string;
+    startAngle: number;
+    endAngle: number;
+    path: string;
+}
+
+
+html:
+
+<div class="pie-wrapper">
+       
+       <!-- <div class="upload-area" (click)="openFilePicker()">
+              <span>Click to upload JSON</span>
+              <small>JSON format: [&#123; label, value &#125;] or &#123; "items": [...] &#125;</small>
+              <input
+                     #fileInput
+                     type="file"
+                     accept=".json,application/json"
+                     style="display: none"
+                     (change)="onFileSelected($event)"
+              />
+       </div> -->
+
+       
+       <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+       <div *ngIf="slices.length; else emptyState" class="chart-area">
+       
+              <svg viewBox="0 0 260 260" width="260" height="260">
+                     <path
+                            *ngFor="let slice of slices; let i = index"
+                            [attr.d]="slice.path"
+                            [attr.fill]="slice.color"
+                            [style.opacity]="getOpacity(i)"
+                            stroke="white"
+                            stroke-width="2"
+                            style="cursor: pointer; transition: opacity 0.2s"
+                            (mouseenter)="onHover(i)"
+                            (mouseleave)="onLeave()"
+                            (click)="onSliceClick(slice)"
+                     />
+
+                     
+                     <text x="130" y="122" text-anchor="middle" class="center-label">
+                            {{ hoveredSlice ? hoveredSlice.label : title }}
+                     </text>
+                     <text x="130" y="144" text-anchor="middle" class="center-value">
+                            {{ hoveredSlice ? toPct(hoveredSlice.percentage) : '' }}
+                     </text>
+              </svg>
+
+
+              <div class="legend">
+                     <div
+                            *ngFor="let slice of slices; let i = index"
+                            class="legend-row"
+                            (mouseenter)="onHover(i)"
+                            (mouseleave)="onLeave()"
+                     >
+                            <span class="dot" [style.background]="slice.color"></span>
+                            <span class="leg-label">{{ slice.label }}</span>
+                            <span class="leg-val">{{ slice.value }}</span>
+                            <span class="leg-pct">{{ toPct(slice.percentage) }}</span>
+                     </div>
+
+                     <div class="legend-total">
+                            <span>Total</span>
+                            <span>{{ getTotal() }}</span>
+                     </div>
+              </div>
+       </div>
+
+       <ng-template #emptyState>
+              <p class="empty-message">No data available to draw the chart.</p>
+       </ng-template>
+</div>
+
+.pie-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.upload-area {
+  border: 1.5px dashed #ccc;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #666;
+  font-size: 14px;
+&:hover { background: #f5f8ff; border-color: #4a6fa5; }
+
+  small { font-size: 11px; color: #aaa; }
+
+}
+
+.error {
+  color: #c0392b;
+  font-size: 13px;
+  background: #fff3f3;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.chart-area {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+
+
+.center-label {
+  font-size: 12px;
+  fill: #888;
+
+}
+
+.center-value {
+  font-size: 16px;
+  font-weight: 600;
+  fill: #333;
+}
+
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.legend-row {
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+&:hover { background: #f0f4ff; }
+
+}
+
+.dot {
+
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+
+}
+
+.leg-label { flex: 1; color: #333; }
+.leg-val   { color: #555; font-weight: 500; }
+.leg-pct   { color: #999; min-width: 40px; text-align: right; }
+
+.legend-total {
+
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 6px 0;
+  border-top: 1px solid #eee;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+
+}
+ 
+bar chart:
+
+export interface BarChartData {
+    id?: number;
+    label: string;
+    value: number;
+}
+ts
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { BarChartData } from './bar-chart.model';
+
+const COLORS = [
+  '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+];
+
+@Component({
+  selector: 'app-bar-chart',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './bar-chart.component.html',
+  styleUrl: './bar-chart.component.scss'
+})
+export class BarChartComponent implements OnChanges {
+
+  @Input() data: BarChartData[] = [];
+  @Input() title: string = 'Bar Chart';
+  @Output() barSelected = new EventEmitter<BarChartData>();
+  @Output() barClicked = new EventEmitter<BarChartData>();
+
+  maxValue = 0;
+  hoveredIndex = -1;
+
+  ngOnChanges(): void {
+    this.hoveredIndex = -1;
+    this.maxValue = this.data.length ? Math.max(...this.data.map(d => d.value)) : 0;
+  }
+
+  onBarClicked(bar: BarChartData): void {
+    this.barClicked.emit(bar);
+  }
+
+  onHover(index: number): void {
+    this.hoveredIndex = index;
+  }
+
+  onLeave(): void {
+    this.hoveredIndex = -1;
+  }
+
+  getColor(index: number): string {
+    return COLORS[index % COLORS.length];
+  }
+
+  getWidth(value: number): number {
+    if (this.maxValue <= 0) {
+      return 0;
+    }
+    return (value / this.maxValue) * 100;
+  }
+
+  getTotal(): number {
+    return this.data.reduce((sum, item) => sum + item.value, 0);
+  }
+
+  getPercentage(value: number): number {
+    const total = this.getTotal();
+    return total > 0 ? value / total : 0;
+  }
+
+  toPct(value: number): string {
+    return (value * 100).toFixed(1) + '%';
+  }
+}
+
+html
+
+<div class="bar-wrapper">
+    <div *ngIf="data.length; else emptyState" class="chart-area">
+        <div class="bars">
+            <div
+                class="bar-row"
+                *ngFor="let item of data; let i = index"
+                [style.opacity]="hoveredIndex === -1 || hoveredIndex === i ? 1 : 0.4"
+                (mouseenter)="onHover(i)"
+                (mouseleave)="onLeave()"
+                (click)="onBarClicked(item)"
+                style="cursor: pointer;"
+            >
+                <div class="label">{{ item.label }}</div>
+                <div class="bar-container">
+                    <div
+                        class="bar"
+                        [style.width.%]="getWidth(item.value)"
+                        [style.background]="getColor(i)"
+                    ></div>
+                    <div class="value">{{ item.value }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div
+                *ngFor="let item of data; let i = index"
+                class="legend-row"
+                (mouseenter)="onHover(i)"
+                (mouseleave)="onLeave()"
+            >
+                <span class="dot" [style.background]="getColor(i)"></span>
+                <span class="leg-label">{{ item.label }}</span>
+                <span class="leg-val">{{ item.value }}</span>
+                <span class="leg-pct">{{ toPct(getPercentage(item.value)) }}</span>
+            </div>
+
+            <div class="legend-total">
+                <span>Total</span>
+                <span>{{ getTotal() }}</span>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #emptyState>
+        <p class="empty-message">No data available to draw the chart.</p>
+    </ng-template>
+</div>
+
+
+css
+
+:host {
+  display: block;
+}
+
+.bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.chart-area {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 900px;
+}
+
+.bars {
+  flex: 1;
+  min-width: 320px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+  transition: opacity 0.2s ease;
+
+  .label {
+    flex: 0 0 140px;
+    font-size: 14px;
+    color: #333;
+    text-align: right;
+  }
+
+  .bar-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #eef1f4;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    height: 24px;
+  }
+
+  .bar {
+    height: 100%;
+    transition: width 0.4s ease;
+    border-radius: 4px;
+  }
+
+  .value {
+    position: absolute;
+    right: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+
+  &:hover { background: #f0f4ff; }
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.leg-label { flex: 1; color: #333; }
+.leg-val   { color: #555; font-weight: 500; }
+.leg-pct   { color: #999; min-width: 40px; text-align: right; }
+
+.legend-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 6px 0;
+  border-top: 1px solid #eee;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.empty-message {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 40px 0;
+}
