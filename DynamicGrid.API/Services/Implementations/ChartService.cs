@@ -6,8 +6,7 @@ namespace DynamicGrid.API.Services.Implementations;
 public class ChartService : IChartService
 {
     private readonly IChartRepository _repository;
-    public ChartService(
-        IChartRepository repository)
+    public ChartService(IChartRepository repository)
     {
         _repository = repository;
     }
