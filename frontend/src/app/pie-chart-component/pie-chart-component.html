@@ -1,0 +1,21 @@
+<!-- <app-pie-chart [data]="chartData" title="Students By Department"></app-pie-chart> -->
+
+<h2>Students By Department</h2>
+ 
+<table border="1">
+ 
+  <tr>
+    <th>Department</th>
+    <th>Total Students</th>
+  </tr>
+ 
+  <tr *ngFor="let item of chartData">
+ 
+    <td>{{ item.label }}</td>
+ 
+    <td>{{ item.value }}</td>
+ 
+  </tr>
+ 
+</table>
+ 
