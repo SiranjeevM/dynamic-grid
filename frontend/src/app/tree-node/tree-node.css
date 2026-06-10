@@ -1,0 +1,34 @@
+.tree-node {
+  padding-left: 16px;
+}
+ 
+.tree-node__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+ 
+.tree-node__row:hover {
+  background-color: #f0f0f0;
+}
+ 
+.tree-node__row--selected {
+  background-color: #d0e8ff;
+}
+ 
+.tree-node__toggle {
+  font-size: 10px;
+  width: 16px;
+  cursor: pointer;
+}
+ 
+.tree-node__spacer {
+  width: 16px;
+}
+ 
+.tree-node__label {
+  font-size: 14px;
+}

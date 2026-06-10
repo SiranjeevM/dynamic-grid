@@ -15,6 +15,8 @@ builder.Services.AddSwaggerGen();
 // Dependency Injection
 builder.Services.AddScoped<IGridRepository, GridRepository>();
 builder.Services.AddScoped<IGridService,GridService>();
+builder.Services.AddScoped<IChartRepository,ChartRepository>();
+builder.Services.AddScoped<IChartService,ChartService>();
 
 builder.Services.AddCors(options =>
 {

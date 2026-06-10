@@ -1,0 +1,37 @@
+<div class="tree-node">
+
+  <div
+    class="tree-node__row"
+    [class.tree-node__row--selected]="node.isSelected"
+    (click)="onSelect()">
+
+    <span
+      class="tree-node__toggle"
+      *ngIf="node.children && node.children.length"
+      (click)="onToggle(); $event.stopPropagation()">
+      {{ node.isExpanded ? '-' : '+' }}
+    </span>
+
+    <span
+      class="tree-node__spacer"
+      *ngIf="!node.children || !node.children.length">
+    </span>
+
+    <span class="tree-node__label">
+      {{ node.label }}
+    </span>
+
+  </div>
+
+  <div
+    class="tree-node__children"
+    *ngIf="node.isExpanded && node.children && node.children.length">
+
+    <app-tree-node
+      *ngFor="let child of node.children"
+      [node]="child">
+    </app-tree-node>
+
+  </div>
+
+</div>

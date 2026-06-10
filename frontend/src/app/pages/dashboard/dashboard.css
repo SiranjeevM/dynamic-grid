@@ -71,3 +71,23 @@
 
   overflow: auto;
 }
+
+.chart-layout{
+  display:flex;
+  gap:30px;
+  padding:20px;
+}
+ikjh
+.pie-panel{
+  flex:1;
+  border:1px solid #ddd;
+  padding:20px;
+}
+
+.tree-panel{
+  flex:1;
+  border:1px solid #ddd;
+  padding:20px;
+  max-height:600px;
+  overflow:auto;
+}

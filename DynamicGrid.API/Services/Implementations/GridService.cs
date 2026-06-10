@@ -13,41 +13,102 @@ public class GridService : IGridService
         _repository = repository;
     }
 
-    public List<Dictionary<string, object>> GetData(GridRequest request)
+    public List<Dictionary<string, object?>> GetData(GridRequest request)
     {
         if (request.PageNumber < 1)
         {
             request.PageNumber = 1;
         }
+
         if (request.PageSize < 1)
         {
             request.PageSize = 10;
         }
-        // callculating the offset
-        int offset = (request.PageNumber - 1) * request.PageSize;
-        // Convert the sortRules into sql format and build sql dynamically
-        string orderByClause = BuildOrderByClause(request.SortRules);
-        return _repository.GetData(request.TableName, offset, request.PageSize, orderByClause);
+
+        var data = _repository.GetAllData(request.TableName);
+        data = ApplySorting(data, request.SortRules);
+
+        int skip = (request.PageNumber - 1) * request.PageSize;
+        return data.Skip(skip).Take(request.PageSize).ToList();
     }
-    private string BuildOrderByClause(List<SortRule> sortRules)
+
+    private List<Dictionary<string, object?>> ApplySorting(List<Dictionary<string, object?>> data, List<SortRule> sortRules)
     {
-        if (sortRules.Count == 0)
+        if (sortRules == null || sortRules.Count == 0)
         {
-            return "1";
+            return data;
         }
-        string orderBy = "";
+
+        IOrderedEnumerable<Dictionary<string, object?>>? sortedData = null;
+
         foreach (var rule in sortRules)
         {
-            if (orderBy.Contains(rule.Column + " "))
+            if (string.IsNullOrWhiteSpace(rule.Column))
             {
                 continue;
             }
-            orderBy += $"{rule.Column} {rule.Order},";
+
+            if (sortedData == null)
+            {
+                sortedData =
+                    rule.Order.ToUpper() == "DESC"
+                    ? data.OrderByDescending(x => x[rule.Column])
+                    : data.OrderBy(x => x[rule.Column]);
+            }
+            else
+            {
+                sortedData =
+                    rule.Order.ToUpper() == "DESC"
+                    ? sortedData.ThenByDescending(x => x[rule.Column])
+                    : sortedData.ThenBy(x => x[rule.Column]);
+            }
         }
-        if (string.IsNullOrEmpty(orderBy))
+
+        return sortedData?.ToList() ?? data;
+    }
+    public List<StudentTreeNode> GetStudentTree()
+    {
+        var students = _repository.GetAllData("Students");
+
+        var result = new List<StudentTreeNode>();
+
+        var departments = students
+            .GroupBy(x => x["Department"]?.ToString());
+
+        foreach (var dept in departments)
         {
-            return "1";
+            var deptNode = new StudentTreeNode
+            {
+                Id = result.Count + 1,
+                Label = dept.Key ?? ""
+            };
+
+            var years = dept.GroupBy(x => x["Year"]?.ToString());
+
+            foreach (var year in years)
+            {
+                var yearNode = new StudentTreeNode
+                {
+                    Id = deptNode.Children.Count + 1,
+                    Label = "Year " + year.Key
+                };
+
+                foreach (var student in year)
+                {
+                    yearNode.Children.Add(
+                        new StudentTreeNode
+                        {
+                            Id = Convert.ToInt32(student["StudentId"]),
+                            Label = student["StudentName"]?.ToString() ?? ""
+                        });
+                }
+
+                deptNode.Children.Add(yearNode);
+            }
+
+            result.Add(deptNode);
         }
-        return orderBy.TrimEnd(',');
+
+        return result;
     }
 }

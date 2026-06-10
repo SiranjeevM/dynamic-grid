@@ -1,0 +1,14 @@
+<div class="tree-container">
+
+  <button (click)="loadNodes()">Refresh</button>
+
+  <div *ngIf="treeNodes && treeNodes.length > 0">
+
+    <app-tree-node
+      *ngFor="let node of treeNodes"
+      [node]="node">
+    </app-tree-node>
+
+  </div>
+
+</div>

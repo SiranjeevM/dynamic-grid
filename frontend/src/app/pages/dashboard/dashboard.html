@@ -8,29 +8,45 @@
 
     <div class="sidebar">
 
-      <button
-        [class.active]="selectedModule === 'filter'"
-        (click)="showFilter()">
-        Filter Module
+      <button [class.active]="selectedModule === 'filter'" (click)="showFilter()">
+        Filter Records
       </button>
 
-      <button
-        [class.active]="selectedModule === 'sorting'"
-        (click)="showSorting()">
-        Sorting Module
+      <button [class.active]="selectedModule === 'sorting'" (click)="showSorting()">
+        Sort Records
+      </button>
+
+      <button [class.active]="selectedModule === 'chart'" (click)="showChart()">
+        Student Chart
       </button>
 
     </div>
 
     <div class="content">
 
-      <app-dynamic-filter-component
-        *ngIf="selectedModule === 'filter'">
+      <app-dynamic-filter-component *ngIf="selectedModule === 'filter'">
       </app-dynamic-filter-component>
 
-      <app-dynamic-grid
-        *ngIf="selectedModule === 'sorting'">
+      <app-dynamic-grid *ngIf="selectedModule === 'sorting'">
       </app-dynamic-grid>
+
+      <div *ngIf="selectedModule === 'chart'" class="chart-layout">
+
+        <div class="pie-panel">
+
+          <app-pie-chart [data]="departmentData" title="Students By Department">
+          </app-pie-chart>
+
+        </div>
+
+        <div class="tree-panel">
+
+          <app-tree-view>
+          </app-tree-view>
+
+        </div>
+
+      </div>
 
     </div>
 

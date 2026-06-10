@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DynamicFilterComponent } from '../../dynamic-filter/dynamic-filter';
 import { DynamicGrid } from '../../dynamic-grid/dynamic-grid';
+import { PieChartComponent } from '../../pie-chart-component/pie-chart-component';
+
+import { ChartService } from '../../services/chart.service';
+import { TreeViewComponent } from '../../tree-view/tree-view';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,14 +14,45 @@ import { DynamicGrid } from '../../dynamic-grid/dynamic-grid';
   imports: [
     CommonModule,
     DynamicFilterComponent,
-    DynamicGrid
+    DynamicGrid,
+    PieChartComponent,
+    TreeViewComponent
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
 
   selectedModule = 'filter';
+
+  departmentData: any[] = [];
+
+  constructor(
+    private chartService: ChartService
+  ) { }
+
+  ngOnInit(): void {
+
+    this.loadChartData();
+
+  }
+
+  loadChartData() {
+
+    this.chartService
+      .getDepartmentCount()
+      .subscribe({
+        next: (result) => {
+
+          console.log(result);
+
+          this.departmentData = result;
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      });
+  }
 
   showFilter() {
     this.selectedModule = 'filter';
@@ -25,5 +60,9 @@ export class Dashboard {
 
   showSorting() {
     this.selectedModule = 'sorting';
+  }
+
+  showChart() {
+    this.selectedModule = 'chart';
   }
 }
