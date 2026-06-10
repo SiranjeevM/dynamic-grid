@@ -42,4 +42,25 @@ public class ChartService : IChartService
             })
             .ToList();
     }
-}   
+
+    public DashboardSummary GetDashboardSummary()
+    {
+        var students = _repository.GetStudents();
+
+        return new DashboardSummary
+        {
+            TotalStudents = students.Count,
+
+            TotalDepartments = students
+                .Select(x => x.Department)
+                .Distinct()
+                .Count(),
+
+            AverageAttendance = Math.Round(
+                students.Average(x => x.Attendance),
+                2)
+        };
+    }
+
+    
+}

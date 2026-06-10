@@ -17,41 +17,28 @@ public class ChartRepository : IChartRepository
     {
         List<Student> students = new();
 
-        string connectionString =
-            _configuration.GetConnectionString("DefaultConnection");
-
-        using SqlConnection connection =
-            new SqlConnection(connectionString);
-
+        string connectionString =_configuration.GetConnectionString("DefaultConnection");
+        using SqlConnection connection =new SqlConnection(connectionString);
         string query = "SELECT StudentId, StudentName, Department, Attendance FROM Students";
 
-        SqlCommand command =
-            new SqlCommand(query, connection);
-
+        SqlCommand command =new SqlCommand(query, connection);
         connection.Open();
-
-        SqlDataReader reader =
-            command.ExecuteReader();
-
+        SqlDataReader reader =command.ExecuteReader();
         while (reader.Read())
         {
             Student student = new Student();
 
-            student.StudentId =
-                Convert.ToInt32(reader["StudentId"]);
+            student.StudentId =Convert.ToInt32(reader["StudentId"]);
 
-            student.StudentName =
-                reader["StudentName"].ToString()!;
+            student.StudentName =reader["StudentName"].ToString()!;
 
-            student.Department =
-                reader["Department"].ToString()!;
+            student.Department =reader["Department"].ToString()!;
 
-            student.Attendance =
-                Convert.ToInt32(reader["Attendance"]);
-
+            student.Attendance =Convert.ToInt32(reader["Attendance"]);
             students.Add(student);
         }
 
         return students;
     }
+    
 }

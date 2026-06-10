@@ -7,4 +7,7 @@ public interface IChartService
     List<ChartData> GetDepartmentCount();
 
     List<ChartData> GetDepartmentAttendance();
+    DashboardSummary GetDashboardSummary();
+
+    
 }

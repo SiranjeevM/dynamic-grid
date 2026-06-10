@@ -136,3 +136,11 @@ C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\ob
 C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\obj\Debug\net10.0\DynamicGrid.API.pdb
 C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\obj\Debug\net10.0\DynamicGrid.API.genruntimeconfig.cache
 C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\obj\Debug\net10.0\ref\DynamicGrid.API.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\ClosedXML.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\ClosedXML.Parser.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\ExcelNumberFormat.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\RBush.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\SixLabors.Fonts.dll
+C:\Users\sathi\OneDrive\Documents\mentor project\dynamic-grid\DynamicGrid.API\bin\Debug\net10.0\System.IO.Packaging.dll

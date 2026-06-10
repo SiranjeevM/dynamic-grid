@@ -1,6 +1,7 @@
 using DynamicGrid.API.Models;
 using DynamicGrid.API.Repositories.Interfaces;
 using DynamicGrid.API.Services.Interfaces;
+using ClosedXML.Excel;
 
 namespace DynamicGrid.API.Services.Implementations;
 
@@ -69,11 +70,8 @@ public class GridService : IGridService
     public List<StudentTreeNode> GetStudentTree()
     {
         var students = _repository.GetAllData("Students");
-
         var result = new List<StudentTreeNode>();
-
-        var departments = students
-            .GroupBy(x => x["Department"]?.ToString());
+        var departments = students.GroupBy(x => x["Department"]?.ToString());
 
         foreach (var dept in departments)
         {
@@ -110,5 +108,38 @@ public class GridService : IGridService
         }
 
         return result;
+    }
+
+    public byte[] ExportToExcel(GridRequest request)
+    {
+        var data = GetData(request);
+        using var workbook = new XLWorkbook();
+        var worksheet =workbook.Worksheets.Add("Students");
+        if (!data.Any())
+        {
+            using var emptyStream =new MemoryStream();
+            workbook.SaveAs(emptyStream);
+            return emptyStream.ToArray();
+        }
+
+        var columns =data.First().Keys.ToList();
+
+        for (int col = 0; col < columns.Count; col++)
+        {
+            worksheet.Cell(1, col + 1).Value = columns[col];
+        }
+
+        for (int row = 0; row < data.Count; row++)
+        {
+            for (int col = 0; col < columns.Count; col++)
+            {
+                worksheet.Cell(row + 2,col + 1).Value =data[row][columns[col]]?.ToString();
+            }
+        }
+
+        worksheet.Columns().AdjustToContents();
+        using var stream =new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
     }
 }

@@ -17,7 +17,7 @@ public class GridController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetData(string tableName,int pageNumber,int pageSize,string? sortRules)
+    public IActionResult GetData(string tableName, int pageNumber, int pageSize, string? sortRules)
     {
         GridRequest request = new GridRequest
         {
@@ -32,9 +32,31 @@ public class GridController : ControllerBase
             {
                 PropertyNameCaseInsensitive = true
             };
-            request.SortRules =JsonSerializer.Deserialize<List<SortRule>>(sortRules,options) ?? new List<SortRule>();
+            request.SortRules = JsonSerializer.Deserialize<List<SortRule>>(sortRules, options) ?? new List<SortRule>();
         }
         var result = _service.GetData(request);
         return Ok(result);
+    }
+
+    [HttpGet("export")]
+    public IActionResult Export(string sortRules)
+    {
+        var options =new JsonSerializerOptions{PropertyNameCaseInsensitive = true};
+
+        var request = new GridRequest
+        {
+            TableName = "Students",
+            PageNumber = 1,
+            PageSize = 1000,
+            SortRules =JsonSerializer.Deserialize<List<SortRule>>(sortRules, options)?? new List<SortRule>()
+        };
+
+        var file = _service.ExportToExcel(request);
+
+        return File(
+            file,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Students_Ranking.xlsx"
+        );
     }
 }

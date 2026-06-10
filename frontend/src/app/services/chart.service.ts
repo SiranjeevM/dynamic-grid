@@ -24,4 +24,11 @@ export class ChartService {
       `${this.apiUrl}/attendance`
     );
   }
+
+  getSummary() {
+    return this.http.get<any>(
+      `${this.apiUrl}/summary`
+    );
+  }
+  
 }

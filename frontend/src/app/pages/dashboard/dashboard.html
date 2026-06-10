@@ -24,29 +24,88 @@
 
     <div class="content">
 
+      <!-- SEARCH -->
       <app-dynamic-filter-component *ngIf="selectedModule === 'filter'">
       </app-dynamic-filter-component>
 
+      <!-- RANK -->
       <app-dynamic-grid *ngIf="selectedModule === 'sorting'">
       </app-dynamic-grid>
 
-      <div *ngIf="selectedModule === 'chart'" class="chart-layout">
+      <!-- DASHBOARD -->
+      <div *ngIf="selectedModule === 'chart'">
 
-        <div class="pie-panel">
+        <!-- SUMMARY CARDS -->
+        <div class="summary-cards">
 
-          <app-pie-chart [data]="departmentData" title="Department Distribution">
-          </app-pie-chart>
+          <div class="card">
+            <h3>Total Students</h3>
+            <p>{{ summary.totalStudents }}</p>
+          </div>
+
+          <div class="card">
+            <h3>Departments</h3>
+            <p>{{ summary.totalDepartments }}</p>
+          </div>
+
+          <div class="card">
+            <h3>Avg Attendance</h3>
+            <p>{{ summary.averageAttendance }}</p>
+          </div>
 
         </div>
 
-        <div class="tree-panel">
+        <div class="chart-layout">
 
-          <h2>
-            Student Hierarchy
-          </h2>
+          <div class="pie-panel">
 
-          <app-tree-view>
-          </app-tree-view>
+            <app-pie-chart [data]="departmentData" title="Department Distribution">
+            </app-pie-chart>
+
+          </div>
+
+          <div class="tree-panel">
+
+            <h2>
+              Student Hierarchy
+            </h2>
+
+            <app-tree-view>
+            </app-tree-view>
+
+          </div>
+          <div class="details-panel" *ngIf="selectedStudent">
+
+            <h3>
+              Student Details
+            </h3>
+
+            <p>
+              <strong>ID:</strong>
+              {{ selectedStudent.studentId }}
+            </p>
+
+            <p>
+              <strong>Name:</strong>
+              {{ selectedStudent.studentName }}
+            </p>
+
+            <p>
+              <strong>Department:</strong>
+              {{ selectedStudent.department }}
+            </p>
+
+            <p>
+              <strong>Attendance:</strong>
+              {{ selectedStudent.attendance }}
+            </p>
+
+            <p>
+              <strong>CGPA:</strong>
+              {{ selectedStudent.cgpa }}
+            </p>
+
+          </div>
 
         </div>
 

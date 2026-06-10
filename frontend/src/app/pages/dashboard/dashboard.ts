@@ -24,6 +24,8 @@ import { TreeViewComponent } from '../../tree-view/tree-view';
 export class Dashboard implements OnInit {
 
   selectedModule = 'filter';
+  summary: any = {};
+  selectedStudent: any = null;
 
   departmentData: any[] = [];
 
@@ -63,6 +65,23 @@ export class Dashboard implements OnInit {
   }
 
   showChart() {
+
     this.selectedModule = 'chart';
+
+    this.chartService
+      .getDepartmentCount()
+      .subscribe(result => {
+
+        this.departmentData = result;
+
+      });
+
+    this.chartService
+      .getSummary()
+      .subscribe(result => {
+
+        this.summary = result;
+
+      });
   }
 }

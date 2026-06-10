@@ -147,3 +147,20 @@ tbody tr:hover {
   font-weight: 600;
   color: #374151;
 }
+
+/* .export-btn {
+  padding: 8px 12px;
+  background: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+ */
+ .export-btn {
+  margin-left: 10px;
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+}

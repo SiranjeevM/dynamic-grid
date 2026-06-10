@@ -29,4 +29,14 @@ public class ChartController : ControllerBase
             _service.GetDepartmentAttendance()
         );
     }
+
+    [HttpGet("summary")]
+    public IActionResult Summary()
+    {
+        return Ok(
+            _service.GetDashboardSummary()
+        );
+    }
+
+    
 }

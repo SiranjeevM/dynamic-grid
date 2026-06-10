@@ -32,10 +32,10 @@ export class DynamicGrid implements OnInit {
   }
 
   loadDataset(): void {
-    this.gridService.loadGridData(this.selectedDataset,this.currentPage,this.rowsPerPage,this.sortConfigurations).subscribe(data => {
-        this.tableData =data as Record<string, unknown>[];
-        this.columns =this.gridService.generateColumns(this.tableData);
-      });
+    this.gridService.loadGridData(this.selectedDataset, this.currentPage, this.rowsPerPage, this.sortConfigurations).subscribe(data => {
+      this.tableData = data as Record<string, unknown>[];
+      this.columns = this.gridService.generateColumns(this.tableData);
+    });
   }
 
   sortTable(): void {
@@ -45,13 +45,13 @@ export class DynamicGrid implements OnInit {
   }
 
   addSortRule(): void {
-    this.sortConfigurations.push({column: '',order: 'ascending'});
+    this.sortConfigurations.push({ column: '', order: 'ascending' });
     this.saveState();
   }
 
   removeSortRule(index: number): void {
     if (this.sortConfigurations.length > 1) {
-      this.sortConfigurations.splice(index,1);
+      this.sortConfigurations.splice(index, 1);
       this.saveState();
     }
   }
@@ -85,24 +85,37 @@ export class DynamicGrid implements OnInit {
   }
 
   saveState(): void {
-    localStorage.setItem('gridSortRules',JSON.stringify(this.sortConfigurations));
-    localStorage.setItem('gridCurrentPage',this.currentPage.toString());
-    localStorage.setItem('gridSelectedDataset',this.selectedDataset);
+    localStorage.setItem('gridSortRules', JSON.stringify(this.sortConfigurations));
+    localStorage.setItem('gridCurrentPage', this.currentPage.toString());
+    localStorage.setItem('gridSelectedDataset', this.selectedDataset);
   }
 
   loadState(): void {
-    const savedRules =localStorage.getItem('gridSortRules');
+    const savedRules = localStorage.getItem('gridSortRules');
     if (savedRules) {
-      this.sortConfigurations =JSON.parse(savedRules);
+      this.sortConfigurations = JSON.parse(savedRules);
     }
-    const savedPage =localStorage.getItem('gridCurrentPage');
+    const savedPage = localStorage.getItem('gridCurrentPage');
     if (savedPage) {
-      this.currentPage =Number(savedPage);
+      this.currentPage = Number(savedPage);
     }
 
-    const savedDataset =localStorage.getItem('gridSelectedDataset');
+    const savedDataset = localStorage.getItem('gridSelectedDataset');
     if (savedDataset) {
-      this.selectedDataset =savedDataset;
+      this.selectedDataset = savedDataset;
     }
   }
+exportExcel() {
+
+  this.gridService.exportExcel(this.sortConfigurations).subscribe(file => {
+      const blob = new Blob([file]);
+      const url =window.URL.createObjectURL(blob);
+      const a =document.createElement('a');
+      a.href = url;
+      a.download = 'Students_Ranking.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+
+}
 }

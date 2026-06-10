@@ -14,8 +14,21 @@
     <button class="remove-btn" (click)="removeSortRule(i)">Remove</button>
   </div>
 
-  <button class="add-btn" (click)="addSortRule()">Add Sort Rule</button>
-  <button class="sort-btn" (click)="sortTable()">Sort</button>
+  <div class="button-group">
+
+    <button class="add-btn" (click)="addSortRule()">
+      Add Sort Rule
+    </button>
+
+    <button class="sort-btn" (click)="sortTable()">
+      Sort
+    </button>
+
+    <button class="export-btn" (click)="exportExcel()">
+      Export Excel
+    </button>
+
+  </div>
 </div>
 
 <table>
