@@ -2,58 +2,75 @@
 
   <h2>{{ title }}</h2>
 
-  <div
-    *ngIf="slices.length"
-    class="chart-area">
+  <div *ngIf="slices.length" class="chart-container">
 
-    <svg
-      viewBox="0 0 260 260"
-      width="260"
-      height="260">
+    <!-- Pie Chart -->
+    <div class="chart-area">
 
-      <path
-        *ngFor="
-          let slice of slices;
-          let i=index
-        "
-        [attr.d]="slice.path"
-        [attr.fill]="slice.color"
-        [style.opacity]="getOpacity(i)"
-        stroke="white"
-        stroke-width="2"
-        (mouseenter)="onHover(i)"
-        (mouseleave)="onLeave()">
-      </path>
+      <svg
+        viewBox="0 0 260 260"
+        width="260"
+        height="260">
 
-      <text
-        x="130"
-        y="122"
-        text-anchor="middle">
+        <path
+          *ngFor="let slice of slices; let i=index"
+          [attr.d]="slice.path"
+          [attr.fill]="slice.color"
+          [style.opacity]="getOpacity(i)"
+          stroke="white"
+          stroke-width="2"
+          (mouseenter)="onHover(i)"
+          (mouseleave)="onLeave()">
+        </path>
 
-        {{
-          hoveredSlice
-          ? hoveredSlice.label
-          : title
-        }}
+        <text
+          x="130"
+          y="122"
+          text-anchor="middle">
 
-      </text>
+          {{
+            hoveredSlice
+            ? hoveredSlice.label
+            : title
+          }}
 
-      <text
-        x="130"
-        y="145"
-        text-anchor="middle">
+        </text>
 
-        {{
-          hoveredSlice
-          ? toPct(
-            hoveredSlice.percentage
-          )
-          : ''
-        }}
+        <text
+          x="130"
+          y="145"
+          text-anchor="middle">
 
-      </text>
+          {{
+            hoveredSlice
+            ? hoveredSlice.value + ' Students'
+            : ''
+          }}
 
-    </svg>
+        </text>
+
+      </svg>
+
+    </div>
+
+    <div class="legend">
+
+      <div
+        *ngFor="let slice of slices"
+        class="legend-item">
+
+        <span
+          class="legend-color"
+          [style.background]="slice.color">
+        </span>
+
+        <span class="legend-text">
+          {{ slice.label }}
+        </span>
+
+      </div>
+
+    </div>
 
   </div>
 

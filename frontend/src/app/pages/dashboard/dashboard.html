@@ -9,15 +9,15 @@
     <div class="sidebar">
 
       <button [class.active]="selectedModule === 'filter'" (click)="showFilter()">
-        Filter Records
+        Search Records
       </button>
 
       <button [class.active]="selectedModule === 'sorting'" (click)="showSorting()">
-        Sort Records
+        Rank Records
       </button>
 
       <button [class.active]="selectedModule === 'chart'" (click)="showChart()">
-        Student Chart
+        Dashboard
       </button>
 
     </div>
@@ -34,12 +34,16 @@
 
         <div class="pie-panel">
 
-          <app-pie-chart [data]="departmentData" title="Students By Department">
+          <app-pie-chart [data]="departmentData" title="Department Distribution">
           </app-pie-chart>
 
         </div>
 
         <div class="tree-panel">
+
+          <h2>
+            Student Hierarchy
+          </h2>
 
           <app-tree-view>
           </app-tree-view>

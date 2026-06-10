@@ -1,14 +1,21 @@
+/* ===========================
+   APP LAYOUT
+=========================== */
 
 .app-container {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f8fafc;
 }
 
-/* Top header */
+/* ===========================
+   HEADER
+=========================== */
+
 .header {
   height: 70px;
-  background-color: #1f2937;
+  background: #1e293b;
   color: white;
 
   display: flex;
@@ -16,46 +23,60 @@
 
   padding-left: 25px;
 
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 26px;
+  font-weight: 700;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* ===========================
+   MAIN LAYOUT
+=========================== */
 
 .main-container {
   flex: 1;
   display: flex;
 }
 
+/* ===========================
+   SIDEBAR
+=========================== */
 
 .sidebar {
-  width: 220px;
+  width: 240px;
+  background: white;
 
-  border-right: 1px solid #d1d5db;
+  border-right: 1px solid #e5e7eb;
 
   padding: 20px;
 
   display: flex;
   flex-direction: column;
+
   gap: 15px;
 }
 
-
 .sidebar button {
-  padding: 12px;
+  padding: 14px;
 
-  border: 1px solid #d1d5db;
+  border: none;
 
-  background: white;
+  background: #f8fafc;
 
   cursor: pointer;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   text-align: left;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: 0.2s;
 }
 
 .sidebar button:hover {
-  background: #f3f4f6;
+  background: #dbeafe;
 }
 
 .sidebar button.active {
@@ -63,31 +84,68 @@
   color: white;
 }
 
+/* ===========================
+   CONTENT
+=========================== */
 
 .content {
   flex: 1;
-
   padding: 20px;
-
   overflow: auto;
 }
 
-.chart-layout{
-  display:flex;
-  gap:30px;
-  padding:20px;
-}
-ikjh
-.pie-panel{
-  flex:1;
-  border:1px solid #ddd;
-  padding:20px;
+/* ===========================
+   CHART DASHBOARD
+=========================== */
+
+.chart-layout {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 20px;
 }
 
-.tree-panel{
-  flex:1;
-  border:1px solid #ddd;
-  padding:20px;
-  max-height:600px;
-  overflow:auto;
+.pie-panel,
+.tree-panel {
+  background: white;
+
+  border-radius: 12px;
+
+  padding: 20px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pie-panel h2,
+.tree-panel h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+
+  color: #1e293b;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.tree-panel {
+  max-height: 650px;
+  overflow-y: auto;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 1000px) {
+
+  .chart-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
 }

@@ -9,7 +9,7 @@
       class="tree-node__toggle"
       *ngIf="node.children && node.children.length"
       (click)="onToggle(); $event.stopPropagation()">
-      {{ node.isExpanded ? '-' : '+' }}
+      {{ node.isExpanded ? '▼' : '▶' }}
     </span>
 
     <span
