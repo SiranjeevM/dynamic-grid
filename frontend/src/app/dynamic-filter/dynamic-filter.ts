@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { DynamicFilterService } from '../services/dynamic-filter-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-dynamic-filter-component',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule],
   templateUrl: './dynamic-filter.html',
   styleUrl: './dynamic-filter.css',
 })
@@ -26,6 +27,11 @@ export class DynamicFilterComponent implements OnInit {
   public rangeValue: number[] = []; // holds the range values for range filters 
 
   public isnumber: boolean = false;
+  pageSize = 5;
+  currentPage = 0;
+  totalRecords = 0;
+  allData: any[] = [];
+
   constructor(private dynamicFilterService: DynamicFilterService) { }
 
   ngOnInit(): void {
@@ -35,17 +41,25 @@ export class DynamicFilterComponent implements OnInit {
 
   // FOR LOAD DATA
   loadData() {
-    this.dynamicFilterService.getData(this.selectedDataset)
+
+    this.dynamicFilterService
+      .getData(this.selectedDataset)
       .subscribe((data: any) => {
 
-        this.data = data;
+        this.allData = data;
+
+        this.totalRecords = data.length;
 
         if (data.length > 0) {
           this.tableKeys = Object.keys(data[0]);
         }
 
+        this.updatePagedData();
+
         this.rangeValue = [];
+
       });
+
   }
 
   resetFilter() {
@@ -59,7 +73,9 @@ export class DynamicFilterComponent implements OnInit {
     this.selectedOperator = 'contains';
 
     // for reload original data
-    this.loadData();
+    this.currentPage = 0;
+
+this.loadData();
   }
   onColumnChange() {
 
@@ -102,7 +118,13 @@ export class DynamicFilterComponent implements OnInit {
     this.dynamicFilterService.getFilteredData(params)
       .subscribe((res: any) => {
 
-        this.data = res;
+this.allData = res;
+
+this.totalRecords = res.length;
+
+this.currentPage = 0;
+
+this.updatePagedData();
 
         if (res.length > 0) {
           this.tableKeys = Object.keys(res[0]);
@@ -120,4 +142,28 @@ export class DynamicFilterComponent implements OnInit {
       v => !this.minValue || v > this.minValue
     );
   }
+updatePagedData() {
+
+  const start =
+    this.currentPage * this.pageSize;
+
+  const end =
+    start + this.pageSize;
+
+  this.data =
+    this.allData.slice(start, end);
+
+}
+
+onPageChange(event: PageEvent) {
+
+  this.currentPage =
+    event.pageIndex;
+
+  this.pageSize =
+    event.pageSize;
+
+  this.updatePagedData();
+
+}
 }

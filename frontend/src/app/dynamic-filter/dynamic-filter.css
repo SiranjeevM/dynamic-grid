@@ -157,3 +157,7 @@ input:focus {
     justify-content:center;
   }
 }
+mat-paginator {
+  margin-top: 20px;
+  border-radius: 8px;
+}
